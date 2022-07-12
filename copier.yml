@@ -9,9 +9,7 @@ email: talley.lambert@gmail.com
 github_username: tlambert03
 project_name: pyrepo
 project_slug: "{{ project_name.lower().replace(' ', '_').replace('-', '_') }}"
-project_short_description:
-  type: str
-  placeholder: package description.
+project_short_description: package description.
 pypi_username: talley
 version_control: 
   type: str
