@@ -16,4 +16,4 @@ version_control:
   default: setuptools-scm
   choices:
     setuptools-scm: setuptools-scm
-    None: 'none'
+    None: none
