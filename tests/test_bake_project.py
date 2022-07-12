@@ -5,7 +5,7 @@ import subprocess
 from contextlib import contextmanager
 
 import pytest
-from cookiecutter.utils import rmtree
+from shutil import rmtree
 
 
 @contextmanager

@@ -1,4 +1,4 @@
-# pyrepo-cookiecutter
+# pyrepo-copier
 
 This is my personal python repository bootstrap.
 
@@ -9,7 +9,7 @@ Feel free to use it as a launching point for your next project!
 I recommend using [`cruft`](https://github.com/cruft/cruft) instead of cookiecutter (this will let you [update it](#update-it) easily later)
 
 ```sh
-cruft create https://github.com/tlambert03/pyrepo-cookiecutter
+cruft create https://github.com/tlambert03/pyrepo-copier
 ```
 
 After creating the repo, you'll probably want to initialize a git repo, and install [pre-commit](https://pre-commit.com/):
