@@ -1,3 +1,9 @@
+# ---------- CONFIG --------
+
+_subdirectory: project
+
+# ---------- PROMPT --------
+
 full_name: Talley Lambert
 email: talley.lambert@gmail.com
 github_username: tlambert03
