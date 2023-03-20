@@ -3,7 +3,6 @@ import shutil
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
-from re import TEMPLATE
 from subprocess import run
 from typing import Any, Callable
 
@@ -56,7 +55,7 @@ def test_copier(template: Path, copier: Callable[..., Path]):
     )
     prj = tomli.loads((output / "pyproject.toml").read_text())["project"]
     assert prj["name"] == NAME
-    assert prj["authors"] == [{"email": "test@example.com"}, {"name": "Test Name"}]
+    assert prj["authors"] == [{"email": "test@example.com", "name": "Test Name"}]
 
 
 def test_bake_and_test(template: Path, copier: Callable[..., Path]):
