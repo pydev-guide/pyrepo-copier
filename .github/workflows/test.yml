@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest build check-manifest pre-commit copier
+          pip install pytest build check-manifest pre-commit copier tomli
 
       - name: Test
         run: pytest tests -v --color=yes
