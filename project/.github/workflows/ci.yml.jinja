@@ -12,9 +12,10 @@ on:
   schedule:
     # run every week (for --pre release tests)
     - cron: "0 0 * * 0"
-  {%- endif %}{% raw %}
+  {%- endif %}
 
 jobs:
+{%- if mode != 'simple' %}
   check-manifest:
     # check-manifest is a tool that checks that all files in version control are
     # included in the sdist (unless explicitly excluded)
@@ -22,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: pipx run check-manifest
-
+{% endif %}{% raw %}
   test:
     name: ${{ matrix.platform }} (${{ matrix.python-version }})
     runs-on: ${{ matrix.platform }}
@@ -87,6 +88,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: 🐍 Set up Python
         uses: actions/setup-python@v4
@@ -95,11 +98,10 @@ jobs:
 
       - name: 👷 Build
         run: |
-          git tag
           python -m pip install build
           python -m build
 
-      - name: 🚢 Publish distribution 📦 to PyPI
+      - name: 🚢 Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: ${{ secrets.TWINE_API_KEY }}
