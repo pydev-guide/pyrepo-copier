@@ -1,6 +1,6 @@
 """{{ project_short_description }}"""
 
-{% if version_control == 'setuptools-scm' -%}
+{% if git_versioning -%}
 from importlib.metadata import PackageNotFoundError, version
 
 try:
@@ -10,5 +10,5 @@ except PackageNotFoundError:
 {%- else -%}
 __version__ = '0.1.0'
 {%- endif %}
-__author__ = "{{ full_name }}"
-__email__ = "{{ email }}"
+__author__ = "{{ author_name }}"
+__email__ = "{{ author_email }}"

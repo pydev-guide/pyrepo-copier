@@ -37,35 +37,38 @@ def template():
 
 
 @pytest.fixture
-def copier(tmp_path: Path):
+def run_copier(tmp_path: Path):
     def _copier(template: Path, dest: Path = tmp_path, **kwargs: Any):
         cmd = ["copier", "--force", str(template), str(dest)]
         for k, v in kwargs.items():
-            cmd.extend(["-d", f"{k}={v!r}"])
+            cmd.extend(["-d", f"{k}={v}"])
         run(cmd, check=True)
         return tmp_path
 
     return _copier
 
 
-def test_copier(template: Path, copier: Callable[..., Path]):
+def test_copier(template: Path, run_copier: Callable[..., Path]):
     NAME = "some-project"
-    output = copier(
-        template, full_name="Test Name", email="test@example.com", project_name=NAME
+    output = run_copier(
+        template,
+        author_name="Test Name",
+        author_email="test@example.com",
+        project_name=NAME,
     )
     prj = tomli.loads((output / "pyproject.toml").read_text())["project"]
     assert prj["name"] == NAME
     assert prj["authors"] == [{"email": "test@example.com", "name": "Test Name"}]
 
 
-def test_bake_and_test(template: Path, copier: Callable[..., Path]):
+def test_bake_and_test(template: Path, run_copier: Callable[..., Path]):
     NAME = "some-project"
-    output = copier(template, project_name=NAME)
+    output = run_copier(template, project_name=NAME)
     run(["python", "-m", "pytest", str(output / "tests")], check=True)
 
 
-def test_bake_and_build(template, copier: Callable[..., Path]):
-    output = copier(template)
+def test_bake_and_build(template, run_copier: Callable[..., Path]):
+    output = run_copier(template)
 
     with inside_dir(str(output)):
         run(["git", "init", "-q"], check=True)
@@ -79,8 +82,8 @@ def test_bake_and_build(template, copier: Callable[..., Path]):
         assert len(list((output / "dist").iterdir())) == 2
 
 
-def test_bake_and_pre_commit(template, copier: Callable[..., Path]):
-    output = copier(template)
+def test_bake_and_pre_commit(template, run_copier: Callable[..., Path]):
+    output = run_copier(template)
 
     with inside_dir(str(output)):
         run(["git", "init", "-q"], check=True)
