@@ -20,7 +20,7 @@ mode:
   help: "Welcome! Please select a mode:"
   type: str
   choices:
-    ✨ Full featured - default tooling: tooling
+    ✨ Fully featured - default tooling: tooling
     📦 Simple package - minimal tooling: simple
     🙋‍♀️ Customize - ask me questions: customize
 
