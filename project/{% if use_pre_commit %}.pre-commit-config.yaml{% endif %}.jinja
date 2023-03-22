@@ -12,20 +12,23 @@ repos:
     rev: v0.12.1
     hooks:
       - id: validate-pyproject
-{% if use_ruff %}
+{%- if use_ruff %}
+
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.0.257
     hooks:
       - id: ruff
         args: [--fix]
 {%- endif %}
-{% if use_black %}
+{%- if use_black %}
+
   - repo: https://github.com/psf/black
     rev: 23.1.0
     hooks:
       - id: black
 {%- endif %}
-{% if use_mypy %}
+{%- if use_mypy %}
+
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.1.1
     hooks:

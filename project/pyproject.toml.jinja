@@ -43,7 +43,9 @@ dependencies = []
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
 # "extras" (e.g. for `pip install .[test]`)
 [project.optional-dependencies]
+# add dependencies used for testing here
 test = ["pytest", "pytest-cov"]
+# add anything else you like to have in your dev environment here
 dev = [
     {%- if use_black %}
     "black",{%- endif %}
@@ -53,8 +55,6 @@ dev = [
     "pdbpp",  # https://github.com/pdbpp/pdbpp
     {%- if use_precommit %}
     "pre-commit",{%- endif %}
-    "pytest-cov",
-    "pytest",
     "rich",  # https://github.com/Textualize/rich
     {%- if use_ruff %}
     "ruff",{%- endif %}

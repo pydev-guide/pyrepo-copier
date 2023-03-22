@@ -76,6 +76,14 @@ github_username:
     Your GitHub username/organization name
        (If you plan to put your project on GitHub)
 
+test_pre_release:
+  when: "{{ mode == 'customize' }}"
+  help: |
+    Would you like to run tests against dependecy pre-releases
+       on a Github Actions cron job?
+  type: bool
+  default: "{{ mode != 'simple' }}"
+
 use_pre_commit:
   when: "{{ mode == 'customize' }}"
   type: bool
