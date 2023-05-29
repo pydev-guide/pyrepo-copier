@@ -134,13 +134,6 @@ to PyPI. (see the "deploy" step in `workflows/ci.yml`). The version number is de
 [hatch-vcs](https://github.com/ofek/hatch-vcs)... which wraps
 [setuptools-scm](https://github.com/pypa/setuptools_scm/)
 
-To auto-deploy to PyPI, you'll need to set a `TWINE_API_KEY` environment
-variable in your github repo settings.  You can get this key from your [pypi
-account](https://pypi.org/manage/account/token/).  Then add it to your github
-repository settings as a secret named `TWINE_API_KEY`. (see [github
-docs](https://docs.github.com/en/actions/reference/encrypted-secrets#creating-encrypted-secrets-for-a-repository))
-
-(the name `TWINE_API_KEY` is specified in `workflows/ci.yml`)
 
 ```sh
 git tag -a v0.1.0 -m v0.1.0
@@ -149,6 +142,16 @@ git push --follow-tags
 # or, specify a remote:
 # git push upstream --follow-tags
 ```
+
+
+To auto-deploy to PyPI, you will need to perform two important steps:
+1. Create a `release` environment in Github
+2. Create a trusted publisher on PyPi
+
+(1) To create the Github environment, go in your Github repository to "Settings > Environemnts". Click on "new environment" and name it `release`, then click on configure. Next, in "Deployment branches", choose "Selected branches" and add a "deploment branch rule". Use `v*.*.*` as branch name patter. This allows the CI to run on Github (see `environment: release` in the "deploy" step in `workflows/ci.yml`)! 
+
+(2) Finally, connect to PyPi (you need an account). Go to your projects and click on "Publishing" (last item on the left menu). In the section "Add a new pending publisher", enter the project name (as in your `pyproject.toml`), the organization or username of the repository owner (on Github) and the repository name. Next, enter `ci.yml` as "Workflow name" and `release` as "Environment name". Add the publisher and you are good to go!
+
 
 ## Update your repo
 
