@@ -23,7 +23,7 @@ mode:
   choices:
     ✨ Fully featured - default tooling: tooling
     📦 Simple package - minimal tooling: simple
-    🙋‍♀️ Customize - ask me questions: customize
+    🙋 Customize - ask me questions: customize
 
 project_name:
   help: Name of your project (prefer hyphens to underscores)
