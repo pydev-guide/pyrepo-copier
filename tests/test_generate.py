@@ -42,6 +42,7 @@ def run_copier(tmp_path: Path):
         cmd = ["copier", "--force", str(template), str(dest)]
         for k, v in kwargs.items():
             cmd.extend(["-d", f"{k}={v}"])
+
         run(cmd, check=True)
         return tmp_path
 

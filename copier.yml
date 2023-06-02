@@ -8,8 +8,8 @@ _skip_if_exists:
 # _tasks:
 #   - git init -q --initial-branch=main || true
 #   - "{{ use_pre_commit }} && pre-commit autoupdate || echo 'please run: pip install pre-commit && pre-commit autoupdate'"
-#   - git add . && 
-#     git commit -q -m 'initial commit' && 
+#   - git add . &&
+#     git commit -q -m 'initial commit' &&
 #     echo 'git repo initialized' || echo 'git init failed'
 
 # ---------- PROMPT --------
@@ -19,10 +19,11 @@ _skip_if_exists:
 mode:
   help: "Welcome! Please select a mode:"
   type: str
+  default: tooling
   choices:
     ✨ Fully featured - default tooling: tooling
     📦 Simple package - minimal tooling: simple
-    🙋‍♀️ Customize - ask me questions: customize
+    🙋 Customize - ask me questions: customize
 
 project_name:
   help: Name of your project (prefer hyphens to underscores)
@@ -75,6 +76,7 @@ github_username:
   help: |
     Your GitHub username/organization name
        (If you plan to put your project on GitHub)
+  default: ""
 
 test_pre_release:
   when: "{{ mode == 'customize' }}"
