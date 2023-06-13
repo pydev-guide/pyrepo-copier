@@ -19,7 +19,7 @@ Then run `copier`, passing in the template url and the desired
 output directory (usually the name of your new package):
 
 ```sh
-copier gh:pydev-guide/pyrepo-copier your-package-name
+copier copy gh:pydev-guide/pyrepo-copier your-package-name
 ```
 
 ### 2. Run `git init` and install `pre-commit`
