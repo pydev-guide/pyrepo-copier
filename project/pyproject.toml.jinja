@@ -12,6 +12,10 @@ build-backend = "hatchling.build"
 source = "vcs"
 {%- endif %}
 
+[tool.hatch.build.targets.wheel]
+only-include = ["src"]
+sources = ["src"]
+
 # https://peps.python.org/pep-0621/
 [project]
 name = "{{project_name}}"
@@ -79,16 +83,17 @@ repository = "https://github.com/{{github_username}}/{{project_name}}"
 [tool.ruff]
 line-length = 88
 target-version = "py38"
+src = ["src"]
 # https://beta.ruff.rs/docs/rules/
-extend-select = [
+select = [
     "E",    # style errors
     "W",    # style warnings
     "F",    # flakes
     "D",    # pydocstyle
     "I",    # isort
-    "U",    # pyupgrade
+    "UP",   # pyupgrade
     # "S",    # bandit
-    "C",    # flake8-comprehensions
+    "C4",   # flake8-comprehensions
     "B",    # flake8-bugbear
     "A001", # flake8-builtins
     "RUF",  # ruff-specific rules
@@ -98,7 +103,7 @@ extend-select = [
 # otherwise, see:
 # https://beta.ruff.rs/docs/faq/#does-ruff-support-numpy-or-google-style-docstrings
 # https://github.com/charliermarsh/ruff/issues/2606
-extend-ignore = [
+ignore = [
     "D100", # Missing docstring in public module
     "D107", # Missing docstring in __init__
     "D203", # 1 blank line required before class docstring
