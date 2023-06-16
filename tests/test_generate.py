@@ -39,7 +39,7 @@ def template():
 @pytest.fixture
 def run_copier(tmp_path: Path):
     def _copier(template: Path, dest: Path = tmp_path, **kwargs: Any):
-        cmd = ["copier", "--force", str(template), str(dest)]
+        cmd = ["copier", "copy", "--force", str(template), str(dest)]
         for k, v in kwargs.items():
             cmd.extend(["-d", f"{k}={v}"])
 
