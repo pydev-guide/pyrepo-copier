@@ -9,10 +9,14 @@ Feel free to use it as a launching point for your next project!
 ### 1. Create a new repo
 
 This template uses [copier](https://copier.readthedocs.io/) to
-create a new repo from the template.  You can install copier with:
+create a new repo from the template.
+
+**NOTE: copier v8.0 broke our current template.  For now, please install
+ `copier<8`. See [issue
+ #8](https://github.com/pydev-guide/pyrepo-copier/issues/8) for details**
 
 ```sh
-pip install copier
+pip install "copier<8"
 ```
 
 Then run `copier`, passing in the template url and the desired

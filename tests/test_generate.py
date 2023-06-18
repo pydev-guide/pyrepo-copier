@@ -6,10 +6,12 @@ from pathlib import Path
 from subprocess import run
 from typing import Any, Callable
 
+import copier
 import pytest
 import tomli
 
 TEMPLATE = Path(__file__).parent.parent
+COPIER_V8 = copier.__version__.startswith("8.")
 
 
 @contextmanager
@@ -39,9 +41,10 @@ def template():
 @pytest.fixture
 def run_copier(tmp_path: Path):
     def _copier(template: Path, dest: Path = tmp_path, **kwargs: Any):
-        cmd = ["copier", "copy", "--force", str(template), str(dest)]
+        cmd = ["copier", "copy", "--force"] if COPIER_V8 else ["copier", "--force"]
         for k, v in kwargs.items():
             cmd.extend(["-d", f"{k}={v}"])
+        cmd.extend([str(template), str(dest)])
 
         run(cmd, check=True)
         return tmp_path
@@ -85,6 +88,8 @@ def test_bake_and_build(template, run_copier: Callable[..., Path]):
 
 def test_bake_and_pre_commit(template, run_copier: Callable[..., Path]):
     output = run_copier(template)
+
+    assert (output / ".pre-commit-config.yaml").exists()
 
     with inside_dir(str(output)):
         run(["git", "init", "-q"], check=True)
