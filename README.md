@@ -144,13 +144,14 @@ git push --follow-tags
 ```
 
 
-To auto-deploy to PyPI, you will need to perform two important steps:
-1. Create a `release` environment in Github
-2. Create a trusted publisher on PyPi
+To auto-deploy to PyPI, you will need to create a trusted publisher on PyPi:
 
-(1) To create the Github environment, go in your Github repository to "Settings > Environemnts". Click on "new environment" and name it `release`, then click on configure. Next, in "Deployment branches", choose "Selected branches" and add a "deploment branch rule". Use `v*.*.*` as branch name patter. This allows the CI to run on Github (see `environment: release` in the "deploy" step in `workflows/ci.yml`)! 
-
-(2) Finally, connect to PyPi (you need an account). Go to your projects and click on "Publishing" (last item on the left menu). In the section "Add a new pending publisher", enter the project name (as in your `pyproject.toml`), the organization or username of the repository owner (on Github) and the repository name. Next, enter `ci.yml` as "Workflow name" and `release` as "Environment name". Add the publisher and you are good to go!
+- Connect to PyPi (you need an account)
+- Go to your projects and click on "Publishing" (last item on the left menu)
+- In the section "Add a new pending publisher"
+- Enter the project name (as in your `pyproject.toml`), the organization or username of the repository owner (on Github) and the repository name
+- Next, enter `ci.yml` as "Workflow name" and leave the environment blank
+- Add the publisher and you are good to go!
 
 
 ## Update your repo
