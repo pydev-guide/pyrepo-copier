@@ -92,7 +92,6 @@ select = [
     "D",    # pydocstyle
     "I",    # isort
     "UP",   # pyupgrade
-    # "S",    # bandit
     "C4",   # flake8-comprehensions
     "B",    # flake8-bugbear
     "A001", # flake8-builtins
@@ -151,7 +150,7 @@ exclude_lines = [
     "raise NotImplementedError()",
 ]
 [tool.coverage.run]
-source = ["src"]
+source = ["{{module_name}}"]
 
 # https://github.com/mgedmin/check-manifest#configuration
 # add files that you want check-manifest to explicitly ignore here
