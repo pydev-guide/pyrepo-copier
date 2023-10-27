@@ -153,7 +153,6 @@ To auto-deploy to PyPI, you will need to create a trusted publisher on PyPi:
 - Next, enter `ci.yml` as "Workflow name" and leave the environment blank
 - Add the publisher and you are good to go!
 
-
 ## Update your repo
 
 This template may change over time, bringing in new improvements, fixes, and
