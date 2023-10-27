@@ -109,3 +109,9 @@ use_mypy:
   type: bool
   help: Add mypy for static type checking on type hints?
   default: "{{ mode != 'simple' }}"
+
+use_numpydoc:
+  when: "{{ mode == 'customize' and use_pre_commit }}"
+  type: bool
+  help: Add numpydoc for docstring checking?
+  default: "{{ mode != 'simple' }}"

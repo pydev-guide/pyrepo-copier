@@ -117,8 +117,8 @@ ignore = [
 "tests/*.py" = ["D", "S"]
 "setup.py" = ["D"]
 {%- endif -%}
-{%- if use_mypy %}
 
+{%- if use_mypy %}
 # https://mypy.readthedocs.io/en/stable/config_file.html
 [tool.mypy]
 files = "src/**/"
@@ -133,6 +133,20 @@ pretty = true
 # module = ["numpy.*",]
 # ignore_errors = true
 {%- endif %}
+
+{%- if use_numpydoc %}
+[tool.numpydoc_validation]
+checks = [
+    "all",  # report on all checks, except the ones below
+    "EX01", # No examples section found
+    "SA01", # See Also section not found
+    "ES01", # No extended summary found
+]
+exclude = [ # don't report on objects that match any of these regex
+    "test_*",
+]
+{%- endif %}
+
 # https://docs.pytest.org/en/6.2.x/customize.html
 [tool.pytest.ini_options]
 minversion = "6.0"
