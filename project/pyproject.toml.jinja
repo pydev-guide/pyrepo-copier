@@ -2,9 +2,6 @@
 [build-system]
 requires = ["hatchling"{%- if git_versioning -%}, "hatch-vcs"{%- endif %}]
 build-backend = "hatchling.build"
-# read more about configuring hatch at:
-# https://hatch.pypa.io/latest/config/build/
-
 {%- if git_versioning %}
 
 # https://hatch.pypa.io/latest/config/metadata/
@@ -12,6 +9,8 @@ build-backend = "hatchling.build"
 source = "vcs"
 {%- endif %}
 
+# read more about configuring hatch at:
+# https://hatch.pypa.io/latest/config/build/
 [tool.hatch.build.targets.wheel]
 only-include = ["src"]
 sources = ["src"]
@@ -29,6 +28,7 @@ readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "{{ project_license }}" }
 authors = [{ name = "{{ author_name }}", email = "{{ author_email }}" }]
+# https://pypi.org/classifiers/
 classifiers = [
     "Development Status :: 3 - Alpha",
     {%- if project_license == "MIT" %}
@@ -75,6 +75,9 @@ dev = [
 {% if github_username -%}
 homepage = "https://github.com/{{github_username}}/{{project_name}}"
 repository = "https://github.com/{{github_username}}/{{project_name}}"
+{%- else -%}
+# homepage = ""
+# repository = ""
 {%- endif %}
 
 # Entry points
@@ -142,8 +145,8 @@ pretty = true
 # [[tool.mypy.overrides]]
 # module = ["numpy.*",]
 # ignore_errors = true
-
 {%- endif %}
+
 # https://docs.pytest.org/en/6.2.x/customize.html
 [tool.pytest.ini_options]
 minversion = "6.0"
