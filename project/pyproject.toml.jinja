@@ -110,11 +110,11 @@ select = [
     "TCH",  # flake8-type-checking
     # "TID",  # https://docs.astral.sh/ruff/rules/#flake8-tidy-imports-tid
 ]
-# I do this to get numpy-style docstrings AND retain
-# D417 (Missing argument descriptions in the docstring)
+# This is to get numpy-style docstrings AND retain D417
+# (Missing argument descriptions in the docstring)
 # otherwise, see:
-# https://beta.ruff.rs/docs/faq/#does-ruff-support-numpy-or-google-style-docstrings
-# https://github.com/charliermarsh/ruff/issues/2606
+# https://docs.astral.sh/ruff/faq/#does-ruff-support-numpy-or-google-style-docstrings
+# https://github.com/astral-sh/ruff/issues/2606
 ignore = [
     "D100", # Missing docstring in public module
     "D107", # Missing docstring in __init__
