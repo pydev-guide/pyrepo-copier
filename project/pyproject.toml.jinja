@@ -89,7 +89,8 @@ select = [
     "E",    # style errors
     "W",    # style warnings
     "F",    # flakes
-    "D",    # pydocstyle
+    {%- if use_pydocstyle %} 
+    "D",    # pydocstyle {%- endif %}
     "I",    # isort
     "UP",   # pyupgrade
     "C4",   # flake8-comprehensions
@@ -97,11 +98,7 @@ select = [
     "A001", # flake8-builtins
     "RUF",  # ruff-specific rules
 ]
-# I do this to get numpy-style docstrings AND retain
-# D417 (Missing argument descriptions in the docstring)
-# otherwise, see:
-# https://beta.ruff.rs/docs/faq/#does-ruff-support-numpy-or-google-style-docstrings
-# https://github.com/charliermarsh/ruff/issues/2606
+{%- if use_pydocstyle %} 
 ignore = [
     "D100", # Missing docstring in public module
     "D107", # Missing docstring in __init__
@@ -112,13 +109,17 @@ ignore = [
     "D413", # Missing blank line after last section
     "D416", # Section name should end with a colon
 ]
+{%- endif %}
 
 [tool.ruff.per-file-ignores]
-"tests/*.py" = ["D", "S"]
-"setup.py" = ["D"]
-{%- endif -%}
-{%- if use_mypy %}
+"tests/*.py" = [
+    {%- if use_pydocstyle %} 
+    "D", {%- endif %}
+    "S"
+]
+{%- endif %}
 
+{%- if use_mypy %}
 # https://mypy.readthedocs.io/en/stable/config_file.html
 [tool.mypy]
 files = "src/**/"
@@ -133,6 +134,21 @@ pretty = true
 # module = ["numpy.*",]
 # ignore_errors = true
 {%- endif %}
+
+{%- if use_numpydoc %}
+# https://numpydoc.readthedocs.io/en/latest/format.html
+[tool.numpydoc_validation]
+checks = [
+    "all",  # Report on all checks, except the ones below
+    "EX01", # No examples section found
+    "SA01", # See Also section not found
+    "ES01", # No extended summary found
+]
+exclude = [ # don't report on objects that match any of these regex
+    "test_*",
+]
+{%- endif %}
+
 # https://docs.pytest.org/en/6.2.x/customize.html
 [tool.pytest.ini_options]
 minversion = "6.0"

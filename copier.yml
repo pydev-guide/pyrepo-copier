@@ -104,6 +104,18 @@ use_ruff:
   help: Add ruff for linting?
   default: "{{ mode != 'simple' }}"
 
+use_pydocstyle:
+  when: "{{ mode == 'customize' and use_pre_commit and use_ruff }}"
+  type: bool
+  help: Use pydocstyle (via ruff) for checking documentation compliance?
+  default: "{{ use_ruff }}"
+
+use_numpydoc:
+  when: "{{ mode == 'customize' and use_pre_commit and not use_pydocstyle }}"
+  type: bool
+  help: Use numpydoc for checking documentation compliance?
+  default: "{{ not use_pydocstyle and mode != 'simple'}}"
+
 use_mypy:
   when: "{{ mode == 'customize' and use_pre_commit }}"
   type: bool
