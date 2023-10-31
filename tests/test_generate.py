@@ -6,12 +6,10 @@ from pathlib import Path
 from subprocess import run
 from typing import Any, Callable
 
-import copier
 import pytest
 import tomli
 
 TEMPLATE = Path(__file__).parent.parent
-COPIER_V8 = copier.__version__.startswith("8.")
 
 
 @contextmanager
@@ -41,7 +39,7 @@ def template():
 @pytest.fixture
 def run_copier(tmp_path: Path):
     def _copier(template: Path, dest: Path = tmp_path, **kwargs: Any):
-        cmd = ["copier", "copy", "--force"] if COPIER_V8 else ["copier", "--force"]
+        cmd = ["copier", "copy", "--force"]
         for k, v in kwargs.items():
             cmd.extend(["-d", f"{k}={v}"])
         cmd.extend([str(template), str(dest)])
