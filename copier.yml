@@ -114,7 +114,7 @@ use_numpydoc:
   when: "{{ mode == 'customize' and use_pre_commit and not use_pydocstyle }}"
   type: bool
   help: Use numpydoc for documentation checking?
-  default: "{{ not use_pydocstyle }}"
+  default: "{{ not use_pydocstyle and mode != 'simple'}}"
 
 use_mypy:
   when: "{{ mode == 'customize' and use_pre_commit }}"
