@@ -107,13 +107,13 @@ use_ruff:
 use_pydocstyle:
   when: "{{ mode == 'customize' and use_pre_commit and use_ruff }}"
   type: bool
-  help: Use pycodestyle rather than numpydoc (stricter) for documentation checking?
+  help: Use pydocstyle (via ruff) for checking documentation compliance?
   default: "{{ use_ruff }}"
 
 use_numpydoc:
   when: "{{ mode == 'customize' and use_pre_commit and not use_pydocstyle }}"
   type: bool
-  help: Use numpydoc for documentation checking?
+  help: Use numpydoc (stricter) for checking documentation compliance?
   default: "{{ not use_pydocstyle and mode != 'simple'}}"
 
 use_mypy:
