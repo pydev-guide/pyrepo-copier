@@ -110,20 +110,14 @@ select = [
     "TCH",  # flake8-type-checking
     "TID",  # flake8-tidy-imports
 ]
-# This is to get numpy-style docstrings AND retain D417
-# (Missing argument descriptions in the docstring)
-# otherwise, see:
-# https://docs.astral.sh/ruff/faq/#does-ruff-support-numpy-or-google-style-docstrings
-# https://github.com/astral-sh/ruff/issues/2606
-ignore = [
-    "D100", # Missing docstring in public module
-    "D107", # Missing docstring in __init__
-    "D203", # 1 blank line required before class docstring
-    "D212", # Multi-line docstring summary should start at the first line
-    "D213", # Multi-line docstring summary should start at the second line
-    "D401", # First line should be in imperative mood
-    "D413", # Missing blank line after last section
-    "D416", # Section name should end with a colon
+
+[tool.ruff.lint]
+pydocstyle = { convention = "numpy" }
+extend-select = [
+    "D417", # Missing argument descriptions in Docstrings
+]
+extend-ignore = [
+    "D401", # First line should be in imperative mood (remove to opt in)
 ]
 
 [tool.ruff.per-file-ignores]
