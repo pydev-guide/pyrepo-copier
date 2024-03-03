@@ -92,16 +92,10 @@ use_pre_commit:
   help: Would you like to add a pre-commit configuration (linting, formatting, ...)?
   default: "{{ mode != 'simple' }}"
 
-use_black:
-  when: "{{ mode == 'customize' and use_pre_commit }}"
-  type: bool
-  help: Add black for code formatting?
-  default: "{{ mode != 'simple' }}"
-
 use_ruff:
   when: "{{ mode == 'customize' and use_pre_commit }}"
   type: bool
-  help: Add ruff for linting?
+  help: Add ruff for linting and code formatting?
   default: "{{ mode != 'simple' }}"
 
 use_mypy:

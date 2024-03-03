@@ -117,8 +117,7 @@ gh repo create --source=. --public --remote=origin --push
 - [pre-commit](https://pre-commit.com/) with
   - [ruff](https://github.com/charliermarsh/ruff) - amazing linter and
     formatter. Takes the place of `flake8`, `autoflake`, `isort`, `pyupgrade`,
-    and more...
-  - [black](https://github.com/psf/black) - opinionated code formatter
+    `black`, and more...
   - [mypy](https://github.com/python/mypy) - static type hint checker (defaults
     to `strict` mode)
   - [conventional-pre-commit](https://github.com/compilerla/conventional-pre-commit) - enforce good commit messages (this is commented out by default). See [Conventional Commits](#thoughts-on-conventional-commits) below.

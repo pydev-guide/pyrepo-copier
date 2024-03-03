@@ -58,8 +58,6 @@ dependencies = []
 test = ["pytest", "pytest-cov"]
 # add anything else you like to have in your dev environment here
 dev = [
-    {%- if use_black %}
-    "black",{%- endif %}
     "ipython",
     {%- if use_mypy %}
     "mypy",{%- endif %}
@@ -95,12 +93,16 @@ repository = "https://github.com/{{github_username}}/{{project_name}}"
 line-length = 88
 target-version = "py38"
 src = ["src"]
+
 # https://docs.astral.sh/ruff/rules
+[tool.ruff.lint]
+pydocstyle = { convention = "numpy" }
 select = [
     "E",    # style errors
     "W",    # style warnings
     "F",    # flakes
     "D",    # pydocstyle
+    "D417", # Missing argument descriptions in Docstrings
     "I",    # isort
     "UP",   # pyupgrade
     "C4",   # flake8-comprehensions
@@ -110,19 +112,17 @@ select = [
     "TCH",  # flake8-type-checking
     "TID",  # flake8-tidy-imports
 ]
-
-[tool.ruff.lint]
-pydocstyle = { convention = "numpy" }
-extend-select = [
-    "D417", # Missing argument descriptions in Docstrings
-]
-extend-ignore = [
+ignore = [
     "D401", # First line should be in imperative mood (remove to opt in)
 ]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "tests/*.py" = ["D", "S"]
-"setup.py" = ["D"]
+
+# https://docs.astral.sh/ruff/formatter/
+[tool.ruff.format]
+docstring-code-format = true
+skip-magic-trailing-comma = false  # default is false
 {%- endif -%}
 {%- if use_mypy %}
 
@@ -141,14 +141,15 @@ pretty = true
 # ignore_errors = true
 {%- endif %}
 
-# https://docs.pytest.org/en/6.2.x/customize.html
+# https://docs.pytest.org/
 [tool.pytest.ini_options]
-minversion = "6.0"
+minversion = "7.0"
 testpaths = ["tests"]
 filterwarnings = ["error"]
 
-# https://coverage.readthedocs.io/en/6.4/config.html
+# https://coverage.readthedocs.io/
 [tool.coverage.report]
+show_missing = true
 exclude_lines = [
     "pragma: no cover",
     "if TYPE_CHECKING:",
@@ -158,7 +159,6 @@ exclude_lines = [
     "raise NotImplementedError()",
     "pass",
 ]
-show_missing = true
 
 [tool.coverage.run]
 source = ["{{module_name}}"]
