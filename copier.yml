@@ -78,6 +78,18 @@ github_username:
        (If you plan to put your project on GitHub)
   default: ""
 
+minimum_python:
+  when: "{{ mode == 'customize' }}"
+  help: What is the minimum Python version you support (https://devguide.python.org/versions/)?
+  type: int
+  default: 9
+  choices:
+    🐍 3.9: 9
+    🐍 3.10: 10
+    🐍 3.11: 11
+    🐍 3.12: 12
+    🐍 3.13: 13
+
 test_pre_release:
   when: "{{ mode == 'customize' }}"
   help: |
