@@ -25,7 +25,7 @@ version = "0.1.0"
 {%- endif %}
 description = "{{ project_short_description }}"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.{{ minimum_python }}"
 license = { text = "{{ project_license }}" }
 authors = [{ name = "{{ author_name }}", email = "{{ author_email }}" }]
 # https://pypi.org/classifiers/
@@ -41,11 +41,21 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     {%- endif %}
     "Programming Language :: Python :: 3",
+    {%- if minimum_python <= 9 %}    
     "Programming Language :: Python :: 3.9",
+    {%- endif %}
+    {%- if minimum_python <= 10 %}
     "Programming Language :: Python :: 3.10",
+    {%- endif %}
+    {%- if minimum_python <= 11 %}
     "Programming Language :: Python :: 3.11",
+    {%- endif %}
+    {%- if minimum_python <= 12 %}
     "Programming Language :: Python :: 3.12",
+    {%- endif %}
+    {%- if minimum_python <= 13 %}
     "Programming Language :: Python :: 3.13",
+    {%- endif %}
     "Typing :: Typed",
 ]
 # add your package dependencies here
@@ -91,7 +101,7 @@ repository = "https://github.com/{{github_username}}/{{project_name}}"
 # https://docs.astral.sh/ruff
 [tool.ruff]
 line-length = 88
-target-version = "py39"
+target-version = "py3{{ minimum_python }}"
 src = ["src"]
 
 # https://docs.astral.sh/ruff/rules
