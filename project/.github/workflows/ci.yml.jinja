@@ -37,7 +37,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [{%- if minimum_python <= 9 %}"3.9", {%- endif %}{%- if minimum_python <= 10 %} "3.10",  {%- endif %}{%- if minimum_python <= 11 %} "3.11",  {%- endif %}{%- if minimum_python <= 12 %} "3.12",  {%- endif %}{%- if minimum_python <= 13 %} "3.13"{%- endif %}{% raw %}]
+        python-version: [{%- if minimum_python <= 9 %}"3.9", {% endif %}{% if minimum_python <= 10 %}"3.10", {% endif %}{% if minimum_python <= 11 %}"3.11", {% endif %}{% if minimum_python <= 12 %}"3.12",  {% endif %}{% if minimum_python <= 13 %}"3.13"{% endif %}{% raw %}]
         platform: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
