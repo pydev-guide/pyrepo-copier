@@ -80,7 +80,7 @@ github_username:
 
 minimum_python:
   when: "{{ mode == 'customize' }}"
-  help: What is the minimum Python version you support (https://devguide.python.org/versions/)?
+  help: What is the minimum supported Python version (https://devguide.python.org/versions/)?
   type: int
   default: 9
   choices:
