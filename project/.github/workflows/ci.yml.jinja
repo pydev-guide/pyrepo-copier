@@ -30,7 +30,7 @@ jobs:
   test:
     name: ${{ matrix.platform }} (${{ matrix.python-version }})
     runs-on: ${{ matrix.platform }}{% endraw %}
-    {% if test_pre_release -%}
+    {%- if test_pre_release %}
     env:
       UV_PRERELEASE: {% raw %}${{ github.event_name == 'schedule' && 'allow' || '' }}{% endraw %}
     {%- endif %}
