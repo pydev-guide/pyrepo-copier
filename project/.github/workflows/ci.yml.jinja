@@ -29,12 +29,12 @@ jobs:
 {% endif %}{% raw %}
   test:
     name: ${{ matrix.platform }} (${{ matrix.python-version }})
-    runs-on: ${{ matrix.platform }}
+    runs-on: ${{ matrix.platform }}{% endraw %}
     {%- if test_pre_release -%}
     env:
-      UV_PRERELEASE: ${{ github.event_name == 'schedule' && 'allow' || '' }}
+      UV_PRERELEASE: {% raw %}${{ github.event_name == 'schedule' && 'allow' || '' }}{% endraw %}
     {%- endif %}
-    strategy:{% endraw %}
+    strategy:
       fail-fast: false
       matrix:
         python-version: [{%- if minimum_python <= 9 %}"3.9", {% endif -%}
