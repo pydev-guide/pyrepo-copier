@@ -57,8 +57,8 @@ jobs:
         run: uv sync --no-dev --group test
 
       - name: 🧪 Run Tests
-        run: uv run pytest --cov --cov-report=xml --cov-report=term-missing
-      {%- if test_pre_release %}
+        run: uv run pytest --cov --cov-report=xml --cov-report=term-missing{% endraw %}
+      {%- if test_pre_release %}{% raw %}
 
       # If something goes wrong with --pre tests, we can open an issue in the repo
       - name: 📝 Report --pre Failures
@@ -72,7 +72,7 @@ jobs:
           TITLE: "[test-bot] pip install --pre is failing"
         with:
           filename: .github/TEST_FAIL_TEMPLATE.md
-          update_existing: true
+          update_existing: true{% endraw %}
       {%- endif %}{% raw %}
 
       - name: Coverage
