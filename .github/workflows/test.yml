@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: pipx run copier copy . generated --vcs-ref=HEAD
+      - run: pipx run copier copy . generated --vcs-ref=HEAD --defaults
 
       - name: prepare throw-away branch
         run: |
