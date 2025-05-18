@@ -13,10 +13,15 @@
 The easiest way to get started is to use the [github cli](https://cli.github.com)
 and [uv](https://docs.astral.sh/uv/getting-started/installation/):
 
+
 ```sh
+{% if github_username -%}
 gh repo fork {{github_username}}/{{project_name}} --clone
 # or just
 # gh repo clone {{github_username}}/{{project_name}}
+{%- else -%}
+# clone the repo or your fork locally
+{%- endif %}
 cd {{project_name}}
 uv sync
 ```
