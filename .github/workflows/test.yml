@@ -32,6 +32,8 @@ jobs:
 
 
   generate_and_dispatch:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
