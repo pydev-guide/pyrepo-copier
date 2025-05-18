@@ -77,6 +77,8 @@ jobs:
 
       - name: Coverage
         uses: codecov/codecov-action@v5
+        # with:
+        #   token: ${{ secrets.CODECOV_TOKEN }}
 
   build-and-inspect-package:
     name: Build & inspect package.
