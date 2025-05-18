@@ -62,22 +62,9 @@ classifiers = [
 dependencies = []
 
 # https://peps.python.org/pep-0621/#dependencies-optional-dependencies
-# "extras" (e.g. for `pip install .[test]`)
-[project.optional-dependencies]
-# add dependencies used for testing here
-test = ["pytest", "pytest-cov"]
-# add anything else you like to have in your dev environment here
-dev = [
-    "ipython",
-    {%- if use_mypy %}
-    "mypy",{%- endif %}
-    "pdbpp",  # https://github.com/pdbpp/pdbpp
-    {%- if use_pre_commit %}
-    "pre-commit",{%- endif %}
-    "rich",  # https://github.com/Textualize/rich
-    {%- if use_ruff %}
-    "ruff",{%- endif %}
-]
+# add dependencies for "extra" features here.  Not dev dependencies.
+# [project.optional-dependencies]
+# name = ["dependency"]
 
 [project.urls]
 {% if github_username -%}
@@ -97,14 +84,35 @@ repository = "https://github.com/{{github_username}}/{{project_name}}"
 # [project.entry-points."some.group"]
 # tomatoes = "{{module_name}}:main_tomatoes"
 
+# https://peps.python.org/pep-0735/
+# setup with `uv sync` or `pip install -e . --group dev`
+[dependency-groups]
+test = ["pytest", "pytest-cov"]
+dev = [
+    { include-group = "test" },
+    "ipython",
+    {%- if use_mypy %}
+    "mypy",{%- endif %}
+    "pdbpp",  # https://github.com/pdbpp/pdbpp
+    {%- if use_pre_commit %}
+    "pre-commit-uv",{%- endif %}
+    "rich",  # https://github.com/Textualize/rich
+    {%- if use_ruff %}
+    "ruff",{%- endif %}
+]
+
+[tool.uv.sources]
+{{project_name}} = { workspace = true }
+
 {% if use_ruff -%}
 # https://docs.astral.sh/ruff
 [tool.ruff]
 line-length = 88
 target-version = "py3{{ minimum_python }}"
 src = ["src"]
+fix = true
+# unsafe-fixes = true
 
-# https://docs.astral.sh/ruff/rules
 [tool.ruff.lint]
 pydocstyle = { convention = "numpy" }
 select = [
@@ -119,7 +127,7 @@ select = [
     "B",    # flake8-bugbear
     "A001", # flake8-builtins
     "RUF",  # ruff-specific rules
-    "TCH",  # flake8-type-checking
+    "TC",   # flake8-type-checking
     "TID",  # flake8-tidy-imports
 ]
 ignore = [
@@ -128,6 +136,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*.py" = ["D", "S"]
+"docs/*.py" = ["D", "A"]
 
 # https://docs.astral.sh/ruff/formatter/
 [tool.ruff.format]
@@ -135,6 +144,13 @@ docstring-code-format = true
 skip-magic-trailing-comma = false  # default is false
 {%- endif -%}
 {%- if use_mypy %}
+
+# https://docs.pytest.org/
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = ["--color=yes"]
+testpaths = ["tests"]
+filterwarnings = ["error"]
 
 # https://mypy.readthedocs.io/en/stable/config_file.html
 [tool.mypy]
@@ -144,18 +160,13 @@ disallow_any_generics = false
 disallow_subclassing_any = false
 show_error_codes = true
 pretty = true
+# plugins = ["pydantic.mypy"]
 
 # # module specific overrides
 # [[tool.mypy.overrides]]
 # module = ["numpy.*",]
 # ignore_errors = true
 {%- endif %}
-
-# https://docs.pytest.org/
-[tool.pytest.ini_options]
-minversion = "7.0"
-testpaths = ["tests"]
-filterwarnings = ["error"]
 
 # https://coverage.readthedocs.io/
 [tool.coverage.report]
@@ -165,6 +176,7 @@ exclude_lines = [
     "if TYPE_CHECKING:",
     "@overload",
     "except ImportError",
+    "raise AssertionError",
     "\\.\\.\\.",
     "raise NotImplementedError()",
     "pass",
@@ -181,4 +193,9 @@ ignore = [
     ".pre-commit-config.yaml",
     ".ruff_cache/**/*",
     "tests/**/*",
+    "uv.lock",
 ]
+
+# https://github.com/crate-ci/typos/blob/master/docs/reference.md
+[tool.typos.default]
+extend-ignore-identifiers-re = []

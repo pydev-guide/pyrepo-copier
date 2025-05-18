@@ -38,13 +38,24 @@ def template():
 
 @pytest.fixture
 def run_copier(tmp_path: Path):
-    def _copier(template: Path, dest: Path = tmp_path, **kwargs: Any):
+    def _copier(
+        template: Path, dest: Path = tmp_path, git_init: bool = False, **kwargs: Any
+    ):
         cmd = ["copier", "copy", "--force"]
         for k, v in kwargs.items():
             cmd.extend(["-d", f"{k}={v}"])
         cmd.extend([str(template), str(dest)])
 
         run(cmd, check=True)
+        if git_init:
+            with inside_dir(str(tmp_path)):
+                run(["git", "init", "-q"], check=True)
+                gitcfg = tmp_path / ".git" / "config"
+                gitcfg.touch()
+                gitcfg.write_text("[user]\n\tname = Name\n\temail = email@wp.p\n")
+                run(["git", "add", "."], check=True)
+                run(["git", "commit", "-q", "-m", "init"], check=True)
+
         return tmp_path
 
     return _copier
@@ -65,32 +76,26 @@ def test_copier(template: Path, run_copier: Callable[..., Path]):
 
 def test_bake_and_test(template: Path, run_copier: Callable[..., Path]):
     NAME = "some-project"
-    output = run_copier(template, project_name=NAME)
-    run(["python", "-m", "pytest", str(output / "tests")], check=True)
+    output = run_copier(template, project_name=NAME, git_init=True)
+    with inside_dir(str(output)):
+        run(["uv", "run", "pytest"], check=True)
 
 
 def test_bake_and_build(template, run_copier: Callable[..., Path]):
-    output = run_copier(template)
+    output = run_copier(template, git_init=True)
 
     with inside_dir(str(output)):
-        run(["git", "init", "-q"], check=True)
-        gitcfg = output / ".git" / "config"
-        gitcfg.touch()
-        gitcfg.write_text("[user]\n\tname = Name\n\temail = email@wp.p\n")
-        run(["git", "add", "."], check=True)
-        run(["git", "commit", "-q", "-m", "init"], check=True)
-        run(["check-manifest"], check=True)
-        run(["python", "-m", "build"], check=True)
-        assert len(list((output / "dist").iterdir())) == 2
+        run(["uv", "run", "check-manifest"], check=True)
+        run(["uv", "build"], check=True)
+        assert len(list((output / "dist").iterdir())) >= 2
 
 
 def test_bake_and_pre_commit(template, run_copier: Callable[..., Path]):
-    output = run_copier(template)
+    output = run_copier(template, git_init=True)
 
     assert (output / ".pre-commit-config.yaml").exists()
 
     with inside_dir(str(output)):
-        run(["git", "init", "-q"], check=True)
         run(["pre-commit", "autoupdate"], check=True)
         run(["pre-commit", "install"], check=True)
         run(["git", "add", "."], check=True)
