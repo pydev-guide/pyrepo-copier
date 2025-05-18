@@ -1,0 +1,28 @@
+[project]
+name = "pyrepo-copier"
+version = "0.1.0"
+readme = "README.md"
+license = { text = "BSD-3-Clause" }
+
+[tool.mypy]
+disallow_any_decorated = false
+disallow_any_generics = true
+disallow_any_unimported = false
+disallow_subclassing_any = false
+disallow_untyped_calls = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_return_any = true
+
+[tool.pytest.ini_options]
+norecursedirs = "{{project_name}}"
+
+[dependency-groups]
+dev = [
+    "check-manifest>=0.50",
+    "copier>=9.7.1",
+    "pre-commit>=4.2.0",
+    "pytest>=8.3.5",
+    "tomli>=2.2.1",
+]
