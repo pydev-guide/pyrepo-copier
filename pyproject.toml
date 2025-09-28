@@ -27,4 +27,5 @@ dev = [
     "pre-commit>=4.2.0",
     "pytest>=8.3.5",
     "tomli>=2.2.1",
+    "validate-pyproject[all]>=0.24.1",
 ]

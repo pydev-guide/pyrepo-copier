@@ -9,12 +9,6 @@ build-backend = "hatchling.build"
 source = "vcs"
 {%- endif %}
 
-# read more about configuring hatch at:
-# https://hatch.pypa.io/latest/config/build/
-[tool.hatch.build.targets.wheel]
-only-include = ["src"]
-sources = ["src"]
-
 # https://peps.python.org/pep-0621/
 [project]
 name = "{{project_name}}"
@@ -90,18 +84,20 @@ repository = "https://github.com/{{github_username}}/{{project_name}}"
 # https://peps.python.org/pep-0735/
 # setup with `uv sync` or `pip install -e . --group dev`
 [dependency-groups]
-test = ["pytest", "pytest-cov"]
+test = ["pytest >=8", "pytest-cov >=7"]
 dev = [
     { include-group = "test" },
-    "ipython",
+    "ipython >=9.5",
     {%- if use_mypy %}
-    "mypy",{%- endif %}
-    "pdbpp",  # https://github.com/pdbpp/pdbpp
+    "mypy >=1.18",{%- endif %}
+    "pdbpp >=0.11; sys_platform != 'win32'",  # https://github.com/pdbpp/pdbpp
     {%- if use_pre_commit %}
-    "pre-commit-uv",{%- endif %}
-    "rich",  # https://github.com/Textualize/rich
+    "pre-commit-uv >=4.1",{%- endif %}
+    "rich >=14",  # https://github.com/Textualize/rich
     {%- if use_ruff %}
-    "ruff",{%- endif %}
+    "ruff >= 0.13",{%- endif %}
+    {%- if use_ty %}
+    "ty",{%- endif %}
 ]
 
 [tool.uv.sources]
@@ -148,13 +144,6 @@ skip-magic-trailing-comma = false  # default is false
 {%- endif -%}
 {%- if use_mypy %}
 
-# https://docs.pytest.org/
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = ["--color=yes"]
-testpaths = ["tests"]
-filterwarnings = ["error"]
-
 # https://mypy.readthedocs.io/en/stable/config_file.html
 [tool.mypy]
 files = "src/**/"
@@ -169,7 +158,22 @@ pretty = true
 # [[tool.mypy.overrides]]
 # module = ["numpy.*",]
 # ignore_errors = true
-{%- endif %}
+
+{% endif -%}
+{%- if use_ty %}
+
+# https://docs.astral.sh/ty/reference/configuration/
+[tool.ty.src]
+include = ["src", "tests"]
+
+{% endif -%}
+
+# https://docs.pytest.org/
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = ["--color=yes"]
+testpaths = ["tests"]
+filterwarnings = ["error"]
 
 # https://coverage.readthedocs.io/
 [tool.coverage.report]

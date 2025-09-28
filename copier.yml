@@ -125,3 +125,9 @@ use_mypy:
   type: bool
   help: Add mypy for static type checking on type hints?
   default: "{{ mode != 'simple' }}"
+
+use_ty:
+  when: "{{ mode == 'customize' and use_pre_commit }}"
+  type: bool
+  help: Add astral-sh/ty for static type checking on type hints?
+  default: "{{ mode != 'simple' and use_mypy == false }}"

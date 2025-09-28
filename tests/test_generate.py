@@ -123,7 +123,10 @@ def test_bake_and_pre_commit(template, run_copier: Callable[..., Path]):
     ids=lambda d: d["mode"],
 )
 def test_actionlint_on_rendered_workflow(
-    template: Path, run_copier: Callable[..., Path], kwargs: dict[str, Any]
+    template: Path,
+    run_copier: Callable[..., Path],
+    kwargs: dict[str, Any],
+    request: pytest.FixtureRequest,
 ):
     """Test that the rendered CI workflow passes actionlint validation."""
     # Test with default settings (should not have resolution matrix)
@@ -136,6 +139,65 @@ def test_actionlint_on_rendered_workflow(
 
     # Verify no resolution matrix in default output
     ci_content = ci_file.read_text(encoding="utf-8")
+
+    # if we're running pytest in verbose mode with -s, print the pyproject.toml content
+    if request.config.getoption("-v") and request.config.getoption("-s"):
+        print("\n" + ci_content)
+
     is_custom = kwargs["mode"] == "customize"
     assert ("resolution:" in ci_content) is is_custom
     assert ("[${{ matrix.resolution }}]" in ci_content) is is_custom
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"mode": "simple"},
+        {"mode": "tooling"},
+        {"mode": "customize"},
+        {"mode": "customize", "use_mypy": False},
+    ],
+    ids=lambda d: ",".join(f"{k}={v}" for k, v in d.items()),
+)
+def test_validate_pyproject_on_rendered_pyproject(
+    template: Path,
+    run_copier: Callable[..., Path],
+    kwargs: dict[str, Any],
+    request: pytest.FixtureRequest,
+):
+    """Test that the rendered pyproject.toml passes validate-pyproject."""
+    # Test with default settings (should not have resolution matrix)
+    output = run_copier(template, **kwargs)
+    pyproj = output / "pyproject.toml"
+    assert pyproj.exists()
+
+    # Run validate-pyproject on default configuration
+    run(["validate-pyproject", str(pyproj)], check=True)
+
+    # if we're running pytest in verbose mode with -s, print the pyproject.toml content
+    content = pyproj.read_text(encoding="utf-8")
+    if request.config.getoption("-v") and request.config.getoption("-s"):
+        print("\n" + content)
+
+    data = tomli.loads(content)
+    tool = data.get("tool", {})
+    project = data.get("project", {})
+    assert "pytest" in tool
+    if kwargs["mode"] == "simple":
+        assert "version" in project
+        assert "mypy" not in tool
+        assert "ruff" not in tool
+        assert "ty" not in tool
+    elif kwargs["mode"] == "tooling":
+        assert "version" not in project
+        assert project.get("dynamic") == ["version"]
+        assert "mypy" in tool
+        assert "ruff" in tool
+    elif kwargs["mode"] == "customize":
+        assert "ruff" in tool
+        if kwargs.get("use_mypy", True) is False:
+            assert "mypy" not in tool
+            assert "ty" in tool
+        else:
+            assert "mypy" in tool
+            assert "ty" not in tool
