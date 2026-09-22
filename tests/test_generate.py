@@ -13,9 +13,12 @@ import pytest
 import tomli
 
 TEMPLATE = Path(__file__).parent.parent
-# copier's tasks (`git commit`) need a git identity; don't rely on the machine's
-GIT_ENV = {
-    **os.environ,
+# environment for subprocesses run inside generated projects:
+# - copier's tasks (`git commit`) need a git identity; don't rely on the machine's
+# - UV_PYTHON/VIRTUAL_ENV from the outer test environment must not leak into the
+#   generated project's `uv sync`, which has its own `requires-python`
+ENV = {
+    **{k: v for k, v in os.environ.items() if k not in ("UV_PYTHON", "VIRTUAL_ENV")},
     "GIT_AUTHOR_NAME": "Name",
     "GIT_AUTHOR_EMAIL": "email@wp.p",
     "GIT_COMMITTER_NAME": "Name",
@@ -28,7 +31,7 @@ def template() -> Iterator[Path]:
     with tempfile.TemporaryDirectory() as td:
         shutil.copytree(TEMPLATE, td, dirs_exist_ok=True)
         run(["git", "-C", td, "add", ".", "-A"])
-        run(["git", "-C", td, "commit", "-m", "test"], env=GIT_ENV)
+        run(["git", "-C", td, "commit", "-m", "test"], env=ENV)
         run(["git", "-C", td, "tag", "99.99.99"])
         yield Path(td)
 
@@ -41,7 +44,7 @@ def run_copier(tmp_path: Path) -> Callable[..., Path]:
         for k, v in kwargs.items():
             cmd.extend(["-d", f"{k}={v}"])
         cmd.extend([str(template), str(dest)])
-        run(cmd, check=True, env=GIT_ENV)
+        run(cmd, check=True, env=ENV)
         return dest
 
     return _copier
@@ -75,12 +78,12 @@ def test_bake_and_test(template: Path, run_copier: Callable[..., Path]) -> None:
         project_name="some-project",
         minimum_python=sys.version_info.minor,  # use current minor version for CI
     )
-    run(["uv", "run", "pytest"], check=True, cwd=output)
+    run(["uv", "run", "pytest"], check=True, cwd=output, env=ENV)
 
 
 def test_bake_and_build(template: Path, run_copier: Callable[..., Path]) -> None:
     output = run_copier(template, minimum_python=sys.version_info.minor)
-    run(["uv", "build"], check=True, cwd=output)
+    run(["uv", "build"], check=True, cwd=output, env=ENV)
     assert len(list((output / "dist").iterdir())) >= 2
 
 
@@ -93,7 +96,7 @@ def test_bake_and_prek(
     assert (type_checker in config) and ("zizmor" in config)
     # tasks already ran `prek install`
     assert (output / ".git" / "hooks" / "pre-commit").exists()
-    run(["uv", "run", "prek", "run", "--all-files"], check=True, cwd=output)
+    run(["uv", "run", "prek", "run", "--all-files"], check=True, cwd=output, env=ENV)
 
 
 @pytest.mark.parametrize(
