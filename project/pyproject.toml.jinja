@@ -1,6 +1,6 @@
 # https://peps.python.org/pep-0517/
 [build-system]
-requires = ["hatchling"{%- if git_versioning -%}, "hatch-vcs"{%- endif %}]
+requires = ["hatchling>=1.27"{%- if git_versioning -%}, "hatch-vcs"{%- endif %}]
 build-backend = "hatchling.build"
 {%- if git_versioning %}
 
@@ -26,39 +26,19 @@ version = "0.1.0"
 description = "{{ project_short_description }}"
 readme = "README.md"
 requires-python = ">=3.{{ minimum_python }}"
-license = { text = "{{ project_license }}" }
+{%- if project_license != 'none' %}
+# https://peps.python.org/pep-0639/
+license = "{{ project_license }}"
+license-files = ["LICENSE"]
+{%- endif %}
 authors = [{ name = "{{ author_name }}", email = "{{ author_email }}" }]
 # https://pypi.org/classifiers/
 classifiers = [
     "Development Status :: 3 - Alpha",
-    {%- if project_license == "MIT" %}
-    "License :: OSI Approved :: MIT License",
-    {%- elif project_license == "Apache-2.0" %}
-    "License :: OSI Approved :: Apache Software License",
-    {%- elif project_license == "BSD-3-Clause" %}
-    "License :: OSI Approved :: BSD License",
-    {%- elif project_license == "GPL-3.0" %}
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-    {%- endif %}
     "Programming Language :: Python :: 3",
-    {%- if minimum_python <= 9 %}
-    "Programming Language :: Python :: 3.9",
-    {%- endif %}
-    {%- if minimum_python <= 10 %}
-    "Programming Language :: Python :: 3.10",
-    {%- endif %}
-    {%- if minimum_python <= 11 %}
-    "Programming Language :: Python :: 3.11",
-    {%- endif %}
-    {%- if minimum_python <= 12 %}
-    "Programming Language :: Python :: 3.12",
-    {%- endif %}
-    {%- if minimum_python <= 13 %}
-    "Programming Language :: Python :: 3.13",
-    {%- endif %}
-    {%- if minimum_python <= 14 %}
-    "Programming Language :: Python :: 3.14",
-    {%- endif %}
+    {%- for v in range(minimum_python, latest_python + 1) %}
+    "Programming Language :: Python :: 3.{{ v }}",
+    {%- endfor %}
     "Typing :: Typed",
 ]
 # add your package dependencies here
@@ -90,45 +70,45 @@ repository = "https://github.com/{{github_username}}/{{project_name}}"
 # https://peps.python.org/pep-0735/
 # setup with `uv sync` or `pip install -e . --group dev`
 [dependency-groups]
-test = ["pytest", "pytest-cov"]
+test = ["pytest>=9.0", "pytest-cov"]
 dev = [
     { include-group = "test" },
-    "ipython",
-    {%- if use_mypy %}
-    "mypy",{%- endif %}
-    "pdbpp",  # https://github.com/pdbpp/pdbpp
+    {%- if type_checker == 'mypy' %}
+    "mypy",
+    {%- endif %}
     {%- if use_pre_commit %}
-    "pre-commit-uv",{%- endif %}
-    "rich",  # https://github.com/Textualize/rich
+    "prek",  # https://prek.j178.dev/
+    {%- endif %}
     {%- if use_ruff %}
-    "ruff",{%- endif %}
+    "ruff",
+    {%- endif %}
+    {%- if type_checker == 'ty' %}
+    "ty",
+    {%- endif %}
 ]
-
-[tool.uv.sources]
-{{project_name}} = { workspace = true }
 
 {% if use_ruff -%}
 # https://docs.astral.sh/ruff
 [tool.ruff]
 line-length = 88
-target-version = "py3{{ minimum_python }}"
 src = ["src"]
-fix = true
+# fix = true  # auto-fix on `ruff check` (the pre-commit hook already passes --fix)
 # unsafe-fixes = true
 
 [tool.ruff.lint]
 pydocstyle = { convention = "numpy" }
-select = [
+# ruff's default rule set is already extensive (F, E7/E9, B, UP, C4, SIM, PERF,
+# PTH, FURB, RUF, ...). See https://docs.astral.sh/ruff/default-rules/
+# the following are added on top of the defaults.
+extend-select = [
     "E",    # style errors
     "W",    # style warnings
-    "F",    # flakes
     "D",    # pydocstyle
     "D417", # Missing argument descriptions in Docstrings
     "I",    # isort
     "UP",   # pyupgrade
     "C4",   # flake8-comprehensions
     "B",    # flake8-bugbear
-    "A001", # flake8-builtins
     "RUF",  # ruff-specific rules
     "TC",   # flake8-type-checking
     "TID",  # flake8-tidy-imports
@@ -145,24 +125,33 @@ ignore = [
 [tool.ruff.format]
 docstring-code-format = true
 skip-magic-trailing-comma = false  # default is false
-{%- endif -%}
-{%- if use_mypy %}
 
-# https://docs.pytest.org/
-[tool.pytest.ini_options]
-minversion = "7.0"
+{% endif -%}
+
+# https://docs.pytest.org/en/stable/reference/customize.html#pyproject-toml
+[tool.pytest]
+minversion = "9.0"
 addopts = ["--color=yes"]
 testpaths = ["tests"]
 filterwarnings = ["error"]
+{%- if type_checker == 'ty' %}
+
+# https://docs.astral.sh/ty/reference/configuration/
+[tool.ty.environment]
+root = ["./src"]
+
+# [tool.ty.rules]
+# possibly-unresolved-reference = "warn"
+{%- elif type_checker == 'mypy' %}
 
 # https://mypy.readthedocs.io/en/stable/config_file.html
 [tool.mypy]
-files = "src/**/"
+files = "src"
 strict = true
 disallow_any_generics = false
 disallow_subclassing_any = false
-show_error_codes = true
 pretty = true
+# num_workers = 4  # parallel type checking (mypy >= 2.0)
 # plugins = ["pydantic.mypy"]
 
 # # module specific overrides
@@ -187,17 +176,6 @@ exclude_lines = [
 
 [tool.coverage.run]
 source = ["{{module_name}}"]
-
-# https://github.com/mgedmin/check-manifest#configuration
-# add files that you want check-manifest to explicitly ignore here
-# (files that are in the repo but shouldn't go in the package)
-[tool.check-manifest]
-ignore = [
-    ".pre-commit-config.yaml",
-    ".ruff_cache/**/*",
-    "tests/**/*",
-    "uv.lock",
-]
 
 # https://github.com/crate-ci/typos/blob/master/docs/reference.md
 [tool.typos.default]
