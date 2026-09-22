@@ -1,6 +1,6 @@
 # Python Package Template
 
-This is a template for a python package.
+This is a [copier](https://copier.readthedocs.io/) template for a python package.
 
 Feel free to use it as a launching point for your next project!
 
@@ -8,69 +8,37 @@ Feel free to use it as a launching point for your next project!
 
 ### 1. Create a new repo
 
-This template uses [copier](https://copier.readthedocs.io/) to
-create a new repo from the template.
+You need [uv](https://docs.astral.sh/uv/getting-started/installation/) and
+[git](https://git-scm.com/) installed.  Then run `copier`, passing in the
+template url and the desired output directory (usually the name of your new
+package):
 
 ```sh
-pip install "copier"
+uvx copier copy --trust gh:pydev-guide/pyrepo-copier your-package-name
 ```
 
-Then run `copier`, passing in the template url and the desired
-output directory (usually the name of your new package):
+> `--trust` is required because the template runs a few
+> [tasks](https://copier.readthedocs.io/en/stable/configuring/#tasks) after
+> generating the project: `git init`, `uv sync`, an initial commit, and
+> `prek install`.  Omit it if you'd rather do those yourself (copier will error;
+> see the `_tasks` section in `copier.yml` for exactly what they do).
 
-```sh
-copier copy gh:pydev-guide/pyrepo-copier your-package-name
-```
-
-### 2. Run `git init` and install `pre-commit`
-
-After creating the repo, you'll want to initialize a git repo.
-
-> *This is important: you won't be able to `run pip install -e .`
-without running `git init`*
+### 2. Run the tests
 
 ```sh
 cd <your-package-name>
-git init
-git add .
-git commit -m 'build: Initial Commit'
+uv run pytest
 ```
 
-If you selected pre-commit (or used the "full-featured" default),
-install [pre-commit](https://pre-commit.com/), run `pre-commit autoupdate`,
-and then install the git commit hook with `pre-commit install`:
+### 3. Lint
+
+If you selected pre-commit (or used the "full-featured" default), hooks are
+installed via [prek](https://prek.j178.dev/) (a fast, drop-in replacement for
+[pre-commit](https://pre-commit.com/)) and run on every commit.  To run them
+manually:
 
 ```sh
-pip install pre-commit
-pre-commit autoupdate
-pre-commit install
-git add .
-git commit -m 'chore: update pre-commit'
-```
-
-### 3. Install Locally and Run Tests
-
-To run tests locally, you'll need to install the package in editable mode. 
-
-I like to first create a new environment dedicated to my package:
-
-```sh
-mamba create -n <your-package-name> python
-mamba activate <your-package-name>
-```
-
-Then install the package in editable mode:
-
-```sh
-pip install -e .[test]
-```
-
-*if you run into problems here, make sure that you ran git init above!*
-
-Finally, run the tests:
-
-```sh
-pytest
+uv run prek run --all-files
 ```
 
 ### 4. Upload to GitHub
@@ -87,52 +55,60 @@ gh repo create --source=. --public --remote=origin --push
 
 ## Next Steps
 
-- If you'd like: setup the [pre-commit.ci](https://pre-commit.ci/) service to
-  run all pre-commit checks on every PR (in case contributors aren't running it
-  locally).  Note that you can always run checks locally with `pre-commit run
-  -a`
+- Enable [Dependabot](https://docs.github.com/en/code-security/dependabot) on
+  the repo: it keeps both GitHub Actions and pre-commit hook versions up to
+  date (see `.github/dependabot.yml`).
 - Follow links below for more info on the included tools (pay particular
   attention to [hatch](https://hatch.pypa.io/) and
-  [ruff](https://beta.ruff.rs/docs/)).
+  [ruff](https://docs.astral.sh/ruff/)).
 - See how to [Deploy to PyPI](#deploying-to-pypi) below.
 
 ## Stuff included
 
 - [PEP 517](https://peps.python.org/pep-0517/) build system with [hatch
   backend](https://hatch.pypa.io/)
-  - build with `python -m build`, [*not* `python
+  - build with `uv build`, [*not* `python
     setup.py`](https://blog.ganssle.io/articles/2021/10/setup-py-deprecated.html)!
-- [PEP 621](https://peps.python.org/pep-0621/) metadata in `pyproject.toml`
+- [PEP 621](https://peps.python.org/pep-0621/) metadata and [PEP
+  639](https://peps.python.org/pep-0639/) license expression in
+  `pyproject.toml`
   - *all* additional configurables are also in `pyproject.toml`, with
   links to documentation
+- [PEP 735](https://peps.python.org/pep-0735/) dependency groups (`test`,
+  `dev`), installed with `uv sync`
 - uses `src` layout ([How come?](https://hynek.me/articles/testing-packaging/))
 - git tag-based versioning with [hatch-vcs](https://github.com/ofek/hatch-vcs)
-- autodeploy to PyPI on tagged commit (set `TWINE_API_KEY` env var on github). See [Deploying to PyPI](#deploying-to-pypi) below.
-- Testing with [pytest](https://docs.pytest.org/en/7.1.x/)
+- autodeploy to PyPI on tagged commit via [trusted
+  publishing](https://docs.pypi.org/trusted-publishers/). See [Deploying to
+  PyPI](#deploying-to-pypi) below.
+- Testing with [pytest](https://docs.pytest.org/)
 - CI & testing with [github actions](https://docs.github.com/en/actions)
+  - actions are pinned to commit SHAs and updated by dependabot
+  - minimal `permissions` per job
 - GitHub action
   [cron-job](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule)
   running tests against dependency pre-releases (using `--pre` to install
   dependencies).
-- [pre-commit](https://pre-commit.com/) with
-  - [ruff](https://github.com/charliermarsh/ruff) - amazing linter and
+- pre-commit hooks, run with [prek](https://prek.j178.dev/) locally and via
+  [prek-action](https://github.com/j178/prek-action) in CI:
+  - [ruff](https://docs.astral.sh/ruff/) - amazing linter and
     formatter. Takes the place of `flake8`, `autoflake`, `isort`, `pyupgrade`,
     `black`, and more...
-  - [mypy](https://github.com/python/mypy) - static type hint checker (defaults
-    to `strict` mode)
-  - [conventional-pre-commit](https://github.com/compilerla/conventional-pre-commit) - enforce good commit messages (this is commented out by default). See [Conventional Commits](#thoughts-on-conventional-commits) below.
-- [`check-manifest`](https://github.com/mgedmin/check-manifest) test to check
-  completeness of files in your release.
-- I use and include [github-changelog-generator](https://github.com/github-changelog-generator/github-changelog-generator) to automate changelog generation... but there are probably better options now (this is a hot topic).
+  - [ty](https://docs.astral.sh/ty/) - fast static type checker (default), or
+    [mypy](https://github.com/python/mypy) (strict mode) if you prefer.
+  - [typos](https://github.com/crate-ci/typos) - spell checker
+  - [actionlint](https://github.com/rhysd/actionlint) and
+    [zizmor](https://docs.zizmor.sh/) - lint & audit GitHub workflows
+  - [validate-pyproject](https://github.com/abravalheri/validate-pyproject)
 
 ## Deploying to PyPI
 
-When you're ready to deploy a version of your package, tag the commit with a version number and
-push it to github.  This will trigger a github action that will build and deploy
-to PyPI. (see the "deploy" step in `workflows/ci.yml`). The version number is determined by the git tag using
+When you're ready to deploy a version of your package, tag the commit with a
+version number and push it to github.  This will trigger a github action that
+will build and deploy to PyPI. (see the "upload-to-pypi" job in
+`workflows/ci.yml`). The version number is determined by the git tag using
 [hatch-vcs](https://github.com/ofek/hatch-vcs)... which wraps
 [setuptools-scm](https://github.com/pypa/setuptools_scm/)
-
 
 ```sh
 git tag -a v0.1.0 -m v0.1.0
@@ -141,7 +117,6 @@ git push --follow-tags
 # or, specify a remote:
 # git push upstream --follow-tags
 ```
-
 
 To auto-deploy to PyPI, you will need to create a trusted publisher on PyPi:
 
@@ -157,5 +132,5 @@ To auto-deploy to PyPI, you will need to create a trusted publisher on PyPi:
 This template may change over time, bringing in new improvements, fixes, and
 updates.  To update an existing project that was created from this template
 using copier, just enter the root of the project, make sure `git status` shows
-the working directory is clean, and run: `copier update`.  See [copier
-docs](https://copier.readthedocs.io/en/stable/updating/) for details.
+the working directory is clean, and run: `uvx copier update --trust`.  See
+[copier docs](https://copier.readthedocs.io/en/stable/updating/) for details.

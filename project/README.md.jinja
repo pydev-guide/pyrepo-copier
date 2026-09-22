@@ -30,9 +30,17 @@ Run tests:
 ```sh
 uv run pytest
 ```
+{%- if use_pre_commit %}
 
-Lint files:
+Lint and type-check files (using [prek](https://prek.j178.dev/)):
 
 ```sh
-uv run pre-commit run --all-files
+uv run prek run --all-files
 ```
+
+To run the hooks automatically on every commit:
+
+```sh
+uv run prek install
+```
+{%- endif %}

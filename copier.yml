@@ -1,16 +1,36 @@
 # ---------- CONFIG --------
 
+_min_copier_version: "9.10.0"
 _subdirectory: project
 _skip_if_exists:
   - README.md
 
-# Tasks to execute after generating or updating a project.
-# _tasks:
-#   - git init -q --initial-branch=main || true
-#   - "{{ use_pre_commit }} && pre-commit autoupdate || echo 'please run: pip install pre-commit && pre-commit autoupdate'"
-#   - git add . &&
-#     git commit -q -m 'initial commit' &&
-#     echo 'git repo initialized' || echo 'git init failed'
+# Tasks to execute after generating a project.
+# NOTE: tasks only run when copier is invoked with `--trust`.
+_tasks:
+  - command: git init -q --initial-branch=main
+    when: "{{ _copier_operation == 'copy' }}"
+  - command: uv sync
+    when: "{{ _copier_operation == 'copy' }}"
+  - command: >-
+      git add -A && git commit -q -m "build: initial commit"
+      || echo "git commit failed (is your git identity configured?)"
+    when: "{{ _copier_operation == 'copy' }}"
+  - command: uv run prek install
+    when: "{{ _copier_operation == 'copy' and use_pre_commit }}"
+
+_message_after_copy: |
+  Your project "{{ project_name }}" has been created at {{ _copier_conf.dst_path }}.
+
+  Next steps:
+    cd {{ _copier_conf.dst_path }}
+    uv run pytest
+  {%- if use_pre_commit %}
+    uv run prek run --all-files
+  {%- endif %}
+
+  To create a GitHub repository and push:
+    gh repo create --source=. --public --remote=origin --push
 
 # ---------- PROMPT --------
 
@@ -82,14 +102,20 @@ minimum_python:
   when: "{{ mode == 'customize' }}"
   help: What is the minimum supported Python version (https://devguide.python.org/versions/)?
   type: int
-  default: 10
+  default: 11
   choices:
-    🐍 3.9: 9
     🐍 3.10: 10
     🐍 3.11: 11
     🐍 3.12: 12
     🐍 3.13: 13
     🐍 3.14: 14
+    🐍 3.15: 15
+
+# computed: the newest python minor version to test against / declare classifiers for
+latest_python:
+  type: int
+  default: 15
+  when: false
 
 test_pre_release:
   when: "{{ mode == 'customize' }}"
@@ -120,8 +146,13 @@ use_ruff:
   help: Add ruff for linting and code formatting?
   default: "{{ mode != 'simple' }}"
 
-use_mypy:
-  when: "{{ mode == 'customize' and use_pre_commit }}"
-  type: bool
-  help: Add mypy for static type checking on type hints?
-  default: "{{ mode != 'simple' }}"
+type_checker:
+  when: "{{ mode == 'customize' }}"
+  type: str
+  help: Which static type checker would you like to use?
+  # `use_mypy` is the pre-2026 name of this question; honor it on `copier update`
+  default: "{{ 'mypy' if (use_mypy is defined and use_mypy) else ('none' if mode == 'simple' else 'ty') }}"
+  choices:
+    "ty (https://docs.astral.sh/ty/)": ty
+    "mypy (https://mypy.readthedocs.io/)": mypy
+    "none": none
