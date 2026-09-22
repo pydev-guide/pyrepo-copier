@@ -110,7 +110,9 @@ def test_bake_and_prek(
             "test_lowest_pinned_dependencies": True,
             "test_pre_release": True,
         },
-        {"mode": "customize", "minimum_python": 15},
+        # NOTE: uv won't auto-download a pre-release python, so 15 fails until
+        # 3.15.0 final ships (2026-10-01); bump this then.
+        {"mode": "customize", "minimum_python": 14},
     ],
     ids=lambda d: "-".join(f"{k}={v}" for k, v in d.items()),
 )
