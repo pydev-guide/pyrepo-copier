@@ -80,19 +80,26 @@ jobs:
         run: uv run pytest --cov --cov-report=xml --cov-report=term-missing{% endraw %}
       {%- if test_pre_release %}{% raw %}
 
-      # If something goes wrong with --pre tests, we can open an issue in the repo
+      # If something goes wrong with --pre tests, open (or update) an issue in the repo
       - name: 📝 Report --pre Failures
         if: failure() && github.event_name == 'schedule'
-        uses: JasonEtco/create-an-issue@1b14a70e4d8dc185e5cc76d3bec9eab20257b2c5 # v2.9.2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           PLATFORM: ${{ matrix.platform }}
           PYTHON: ${{ matrix.python-version }}
-          RUN_ID: ${{ github.run_id }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           TITLE: "[test-bot] pip install --pre is failing"
-        with:
-          filename: .github/TEST_FAIL_TEMPLATE.md
-          update_existing: true{% endraw %}
+        shell: bash
+        run: |
+          BODY="The most recent failing test was on $PLATFORM py$PYTHON with commit $GITHUB_SHA.
+
+          Full run: $RUN_URL"
+          NUMBER=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "\"$TITLE\" in:title" --json number --jq '.[0].number')
+          if [ -n "$NUMBER" ]; then
+            gh issue comment "$NUMBER" --repo "$GITHUB_REPOSITORY" --body "$BODY"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$TITLE" --label bug --body "$BODY"
+          fi{% endraw %}
       {%- endif %}{% raw %}
 
       - name: Coverage

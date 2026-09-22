@@ -2,6 +2,15 @@
 # hook versions are kept up to date by dependabot (see .github/dependabot.yml)
 
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-toml
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
   - repo: https://github.com/abravalheri/validate-pyproject
     rev: 0.26
     hooks:

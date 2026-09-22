@@ -73,15 +73,12 @@ repository = "https://github.com/{{github_username}}/{{project_name}}"
 test = ["pytest>=9.0", "pytest-cov"]
 dev = [
     { include-group = "test" },
-    "ipython",
     {%- if type_checker == 'mypy' %}
     "mypy",
     {%- endif %}
-    "pdbpp",  # https://github.com/pdbpp/pdbpp
     {%- if use_pre_commit %}
     "prek",  # https://prek.j178.dev/
     {%- endif %}
-    "rich",  # https://github.com/Textualize/rich
     {%- if use_ruff %}
     "ruff",
     {%- endif %}
@@ -95,7 +92,7 @@ dev = [
 [tool.ruff]
 line-length = 88
 src = ["src"]
-fix = true
+# fix = true  # auto-fix on `ruff check` (the pre-commit hook already passes --fix)
 # unsafe-fixes = true
 
 [tool.ruff.lint]
